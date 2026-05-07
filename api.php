@@ -8,9 +8,10 @@ $host = getenv('DB_HOST');
 $db   = getenv('DB_DATABASE');
 $user = getenv('DB_USERNAME');
 $pass = getenv('DB_PASSWORD');
+$port = getenv('DB_PORT');
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$db", $user, $pass);
 
     // 3. Pega os dados que o Angular enviou via GET
     $nome  = $_GET['nome']  ?? null;
