@@ -4,10 +4,10 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
 // 2. Dados da conexão
-$host = $env["DB_HOST"];
-$db   = $env["DB_DATABSE"];
-$user = $env["DB_USERNAME"];
-$pass = $env["DB_PASSWORD"];
+$host = getenv('DB_HOST');
+$db   = getenv('DB_DATABASE');
+$user = getenv('DB_USERNAME');
+$pass = getenv('DB_PASSWORD');
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
