@@ -1,7 +1,7 @@
 <?php
 // 1. Permite que o Angular (na porta 4200) acesse este arquivo
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+header("Content-Type: application/json; charset=UTF-8");
 
 // 2. Dados da conexão
 $host = getenv('DB_HOST');
