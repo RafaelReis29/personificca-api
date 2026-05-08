@@ -1,35 +1,52 @@
-# Base PHP image with Apache
-FROM php:8.2-apache
+# syntax=docker/dockerfile:1
 
-# Install required system dependencies
-RUN apt-get update && apt-get install -y \
-  default-mysql-client \
-  && docker-php-ext-install pdo pdo_mysql \
-  && apt-get clean
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Dockerfile reference guide at
+# https://docs.docker.com/go/dockerfile-reference/
 
-# Enable Apache rewrite module
-RUN a2enmod rewrite
+# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
-# Set Apache document root
-ENV APACHE_DOCUMENT_ROOT /var/www/html
+################################################################################
 
-# Update Apache config to use custom document root
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-  /etc/apache2/sites-available/*.conf \
-  /etc/apache2/apache2.conf \
-  /etc/apache2/conf-available/*.conf
+# The example below uses the PHP Apache image as the foundation for running the app.
+# By specifying the "8.5.2-apache" tag, it will also use whatever happens to be the
+# most recent version of that tag when you build your Dockerfile.
+# If reproducibility is important, consider using a specific digest SHA, like
+# php@sha256:99cede493dfd88720b610eb8077c8688d3cca50003d76d1d539b0efc8cca72b4.
+FROM php:8.5.2-apache
 
-# Copy all files to container
-COPY . /var/www/html/
+# Your PHP application may require additional PHP extensions to be installed
+# manually. For detailed instructions for installing extensions can be found, see
+# https://github.com/docker-library/docs/tree/master/php#how-to-install-more-php-extensions
+# The following code blocks provide examples that you can edit and use.
+#
+# Add core PHP extensions, see
+# https://github.com/docker-library/docs/tree/master/php#php-core-extensions
+# This example adds the apt packages for the 'gd' extension's dependencies and then
+# installs the 'gd' extension. For additional tips on running apt-get:
+# https://docs.docker.com/go/dockerfile-aptget-best-practices/
+# RUN apt-get update && apt-get install -y \
+#     libfreetype-dev \
+#     libjpeg62-turbo-dev \
+#     libpng-dev \
+# && rm -rf /var/lib/apt/lists/* \
+#     && docker-php-ext-configure gd --with-freetype --with-jpeg \
+#     && docker-php-ext-install -j$(nproc) gd
+#
+# Add PECL extensions, see
+# https://github.com/docker-library/docs/tree/master/php#pecl-extensions
+# This example adds the 'redis' and 'xdebug' extensions.
+# RUN pecl install redis-5.3.7 \
+#    && pecl install xdebug-3.2.1 \
+#    && docker-php-ext-enable redis xdebug
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html
+# Use the default production configuration for PHP runtime arguments, see
+# https://github.com/docker-library/docs/tree/master/php#configuration
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Railway uses PORT env variable dynamically
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
+# Copy app files from the app directory.
+COPY . /var/www/html
 
-# Expose Railway port
-EXPOSE 8080
-
-# Start Apache
-CMD ["apache2-foreground"]
+# Switch to a non-privileged user (defined in the base image) that the app will run under.
+# See https://docs.docker.com/go/dockerfile-user-best-practices/
+USER www-data
