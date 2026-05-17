@@ -3,19 +3,13 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
-// 2. Dados da conexão
-$host = getenv('DB_HOST');
-$db   = getenv('DB_DATABASE');
-$user = getenv('DB_USERNAME');
-$pass = getenv('DB_PASSWORD');
-$port = getenv('DB_PORT');
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/config.php');
 
 try {
-    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$db", $user, $pass);
-
     // 3. Pega os dados que o Angular enviou via GET
-    $nome  = $_GET['nome']  ?? null;
-    $email = $_GET['email'] ?? null;
+    $nome  = $_POST['nome']  ?? null;
+    $email = $_POST['email'] ?? null;
 
     if ($nome && $email) {
         // 4. Insere no banco
