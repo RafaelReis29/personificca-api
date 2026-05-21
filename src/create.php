@@ -1,27 +1,33 @@
 <?php
-// 1. Permite que o Angular (na porta 4200) acesse este arquivo
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
+require_once __DIR__ . "/config.php";
 
-define('__ROOT__', dirname(dirname(__FILE__)));
-require_once(__ROOT__.'/config.php');
+$data = body();
 
-try {
-    // 3. Pega os dados que o Angular enviou via GET
-    $nome  = $_POST['nome']  ?? null;
-    $email = $_POST['email'] ?? null;
+$stmt = $pdo->prepare("
+    INSERT INTO personas (name, story, category_id, share)
+    VALUES (:name, :story, :category_id, :share)
+    RETURNING id
+");
+$stmt->execute([
+    "name" => $data["name"],
+    "story" => $data["story"],
+    "category_id" => $data["category_id"],
+    "share" => $data["share"]
+]);
 
-    if ($nome && $email) {
-        // 4. Insere no banco
-        $sql = "INSERT INTO usuarios (nome, email) VALUES (:n, :e)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['n' => $nome, 'e' => $email]);
+$personaId = $stmt->fetch()["id"];
+$attributeStmt = $pdo->prepare("
+    INSERT INTO persona_attributes (persona_id, attribute_id, level)
+    VALUES (:persona_id, :attribute_id, :level)
+");
 
-        echo json_encode(["mensagem" => "Sucesso! $nome foi salvo."]);
-    } else {
-        echo json_encode(["mensagem" => "Erro: Preencha todos os campos."]);
-    }
-} catch (PDOException $e) {
-    echo json_encode(["mensagem" => "Erro no banco: " . $e->getMessage()]);
+foreach ($data["attributes"] as $attribute) {
+    $attributeStmt->execute([
+        "persona_id" => $personaId,
+        "attribute_id" => $attribute["id"],
+        "level" => $attribute["level"]
+    ]);
 }
+
+send_json(["message" => "Persona created", "id" => $personaId]);
 ?>
