@@ -8,11 +8,11 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     exit;
 }
 
-$host = getenv("DB_HOST") ?: "db";
-$db = getenv("DB_DATABASE") ?: "personificca";
-$user = getenv("DB_USERNAME") ?: "personificca";
-$pass = getenv("DB_PASSWORD") ?: "personificca";
-$port = getenv("DB_PORT") ?: "5432";
+$host = getenv("DB_HOST");
+$db = getenv("DB_DATABASE");
+$user = getenv("DB_USERNAME");
+$pass = getenv("DB_PASSWORD");
+$port = getenv("DB_PORT");
 
 $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$db", $user, $pass, [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
