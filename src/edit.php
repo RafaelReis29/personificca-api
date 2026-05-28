@@ -6,17 +6,22 @@ $id = $_GET["id"] ?? 0;
 $stmt = $pdo->prepare("
     SELECT
         p.id,
+        p.user_id,
         p.name,
         p.story,
         p.category_id,
         p.share,
         c.name AS category
     FROM personas p
-    JOIN categories c ON c.id = p.category_id
+    LEFT JOIN categories c ON c.id = p.category_id
     WHERE p.id = :id
 ");
 $stmt->execute(["id" => $id]);
 $persona = $stmt->fetch();
+
+if (!$persona) {
+    send_json(null);
+}
 
 $attributes = $pdo->prepare("
     SELECT a.id, a.name, pa.level

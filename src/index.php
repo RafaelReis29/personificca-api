@@ -4,13 +4,14 @@ require_once __DIR__ . "/config.php";
 $rows = $pdo->query("
     SELECT
         p.id,
+        p.user_id,
         p.name,
         p.story,
         p.category_id,
         p.share,
         c.name AS category
     FROM personas p
-    JOIN categories c ON c.id = p.category_id
+    LEFT JOIN categories c ON c.id = p.category_id
     ORDER BY p.id DESC
 ")->fetchAll();
 
